@@ -33,35 +33,33 @@ jobs:
       - name: Build package
         run: |
           . /opt/ros/humble/setup.bash
-          cd /github/workspace
           colcon build --packages-select robot_support_description
 
       - name: Run linting
         run: |
           . /opt/ros/humble/setup.bash
-          cd /github/workspace
           colcon build --packages-select robot_support_description --mixin linter_cc_all
 
       - name: Validate xacro files
         run: |
           . /opt/ros/humble/setup.bash
-          . /github/workspace/install/setup.bash
-          cd /github/workspace/src/robot_support_description
+          . install/setup.bash
+          cd src/robot_support_description
           python3 test/test_urdf_validation.py
 
       - name: Parse URDF files
         run: |
           . /opt/ros/humble/setup.bash
-          . /github/workspace/install/setup.bash
+          . install/setup.bash
           apt-get install -y python3-lxml
-          cd /github/workspace/src/robot_support_description
+          cd src/robot_support_description
           python3 test/test_urdf_validation.py
 
       - name: Test launch files
         run: |
           . /opt/ros/humble/setup.bash
-          . /github/workspace/install/setup.bash
-          cd /github/workspace/src/robot_support_description
+          . install/setup.bash
+          cd src/robot_support_description
           
           echo "Testing kuka_pedestal launch..."
           timeout 5 ros2 launch launch/display.launch.py pedestal_model:=kuka_pedestal || true
