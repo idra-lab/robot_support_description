@@ -35,7 +35,7 @@ jobs:
           . /opt/ros/humble/setup.bash
           colcon build --packages-select robot_support_description
 
-      - name: Run linting
+      - name: Run tests
         run: |
           . /opt/ros/humble/setup.bash
           colcon test --packages-select robot_support_description
@@ -44,7 +44,6 @@ jobs:
         run: |
           . /opt/ros/humble/setup.bash
           . install/setup.bash
-          cd src/robot_support_description
           python3 test/test_urdf_validation.py
 
       - name: Parse URDF files
@@ -52,14 +51,12 @@ jobs:
           . /opt/ros/humble/setup.bash
           . install/setup.bash
           apt-get install -y python3-lxml
-          cd src/robot_support_description
           python3 test/test_urdf_validation.py
 
       - name: Test launch files
         run: |
           . /opt/ros/humble/setup.bash
           . install/setup.bash
-          cd src/robot_support_description
           
           echo "Testing kuka_pedestal launch..."
           timeout 5 ros2 launch launch/display.launch.py pedestal_model:=kuka_pedestal || true
