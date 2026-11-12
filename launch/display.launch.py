@@ -13,6 +13,7 @@ from launch.substitutions import (
     PathJoinSubstitution,
 )
 from launch_ros.substitutions import FindPackageShare
+from launch_ros.parameter_descriptions import ParameterValue
 
 def generate_launch_description():
     
@@ -20,32 +21,34 @@ def generate_launch_description():
         'pedestal_model',
         default_value='kuka_pedestal',
         description='Type of pedestal to display',
-        choices=["kuka_pedestal", "doosan_pedestal"]
+        choices=["kuka_pedestal", "ur_table", "doosan_pedestal"]
     )
     
     # Path to your URDF file
     # xacro_file = os.path.join(
-    #     get_package_share_directory('pedestals_description'),
+    #     get_package_share_directory('robot_support_description'),
     #     'urdf',
     #     pedestal_model
     # )
     
     # robot_description_content = xacro.process_file(xacro_file).toxml()
     
-    robot_description_content = Command([
-        FindExecutable(name="xacro"),
-        " ",
-        PathJoinSubstitution(
-            [
-                FindPackageShare("pedestals_description"),
-                "urdf",
-                LaunchConfiguration('pedestal_model'),
-            ]
-        ),
-        ".xacro"])
+    robot_description_content = ParameterValue(
+        Command([
+            FindExecutable(name="xacro"),
+            " ",
+            PathJoinSubstitution(
+                [
+                    FindPackageShare("robot_support_description"),
+                    "urdf",
+                    LaunchConfiguration('pedestal_model'),
+                ]
+            ),
+            ".urdf.xacro"]),
+        value_type=str)
     
     rviz_config_file = os.path.join(
-        get_package_share_directory('pedestals_description'),
+        get_package_share_directory('robot_support_description'),
         'rviz',
         'config.rviz'
     )

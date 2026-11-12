@@ -1,17 +1,23 @@
 <?xml version="1.0"?>
 
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <xacro:macro name="kuka_pedestal">
+    <xacro:macro name="kuka_pedestal" params="prefix:='' parent *origin">
     
     <!-- Properties for the mesh and dimensions -->
-    <xacro:property name="meshfile" value="package://pedestals_description/meshes/visual/kuka_pedestal.stl" />
-    <!-- <xacro:property name="colladafile" value="package://pedestals_description/meshes/collision/kuka_pedestal.dae" /> --> 
+    <xacro:property name="meshfile" value="package://robot_support_description/meshes/kuka_pedestal/visual/kuka_pedestal.stl" />
+    <!-- <xacro:property name="colladafile" value="package://robot_support_description/meshes/kuka_pedestal/collision/kuka_pedestal.dae" /> --> 
     <xacro:property name="meshscale" value="1 1 1" />
     <!-- Adjust this value to match the actual height of the pedestal -->
     <xacro:property name="pedestalheight" value="0.83" />
     <xacro:property name="pedestalside" value="0.41" />
 
-    <link name="pedestal_base_frame">
+    <joint name="${prefix}pedestal_base_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${prefix}pedestal_base_frame"/>
+      <xacro:insert_block name="origin"/>
+    </joint>
+
+    <link name="${prefix}pedestal_base_frame">
         <visual>
         <geometry>
         <mesh filename="${meshfile}" scale="${meshscale}"/> 
@@ -30,14 +36,14 @@
         <!-- Optionally, include inertial properties if needed -->
     </link>
 
-    <link name="pedestal_top_frame">
+    <link name="${prefix}pedestal_top_frame">
     <!-- You could add visuals or leave it empty if it’s only used as a reference frame -->
     </link>
 
     <!-- Fixed joint connecting the base and top frames -->
-    <joint name="pedestal_base_to_top" type="fixed">
-    <parent link="pedestal_base_frame"/>
-    <child link="pedestal_top_frame"/>
+    <joint name="${prefix}pedestal_base_to_top" type="fixed">
+    <parent link="${prefix}pedestal_base_frame"/>
+    <child link="${prefix}pedestal_top_frame"/>
     <!-- Translate along Z by the pedestal height -->
     <origin xyz="0 0 ${pedestalheight}" rpy="0 0 0"/>
     </joint>

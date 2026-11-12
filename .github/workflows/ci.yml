@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: osrf/ros:humble-desktop
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup ROS environment
+        run: |
+          . /opt/ros/humble/setup.bash
+          echo "ROS_DISTRO=humble" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: |
+          . /opt/ros/humble/setup.bash
+          apt-get update
+          rosdep update
+          rosdep install --from-paths . --ignore-src -y
+
+      - name: Build package
+        run: |
+          . /opt/ros/humble/setup.bash
+          cd /github/workspace
+          colcon build --packages-select robot_support_description
+
+      - name: Run linting
+        run: |
+          . /opt/ros/humble/setup.bash
+          cd /github/workspace
+          colcon build --packages-select robot_support_description --mixin linter_cc_all
+
+      - name: Validate xacro files
+        run: |
+          . /opt/ros/humble/setup.bash
+          . /github/workspace/install/setup.bash
+          cd /github/workspace/src/robot_support_description
+          python3 test/test_urdf_validation.py
+
+      - name: Parse URDF files
+        run: |
+          . /opt/ros/humble/setup.bash
+          . /github/workspace/install/setup.bash
+          apt-get install -y python3-lxml
+          cd /github/workspace/src/robot_support_description
+          python3 test/test_urdf_validation.py
+
+      - name: Test launch files
+        run: |
+          . /opt/ros/humble/setup.bash
+          . /github/workspace/install/setup.bash
+          cd /github/workspace/src/robot_support_description
+          
+          echo "Testing kuka_pedestal launch..."
+          timeout 5 ros2 launch launch/display.launch.py pedestal_model:=kuka_pedestal || true
+          
+          echo "Testing ur_table launch..."
+          timeout 5 ros2 launch launch/display.launch.py pedestal_model:=ur_table || true

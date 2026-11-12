@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<robot name="ur_table" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <link name="world"/>
+
+  <xacro:include filename="$(find robot_support_description)/urdf/ur_table_description.urdf.xacro" />
+
+  <!-- Instantiate the table -->
+  <xacro:ur_table parent="world">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:ur_table>
+
+</robot>

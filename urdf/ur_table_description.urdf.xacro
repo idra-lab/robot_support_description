@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!-- UR table + overhead frame.
+     Frames: table_link, table_top (z up), robot_mount (z DOWN). -->
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+
+  <xacro:macro name="ur_table" params="prefix:='' parent *origin">
+
+    <!-- values from table.sdf -->
+    <xacro:property name="table_mesh" value="package://robot_support_description/meshes/ur_table/visual/ur_table.stl"/>
+    <xacro:property name="table_mesh_offset" value="-0.5 -0.35 0"/>
+
+    <!-- values measured on the mesh, in table_link (offset already applied) -->
+    <xacro:property name="table_top_xyz" value="-0.01 0.05 0.866"/>
+    <xacro:property name="robot_mount_xyz" value="0.01 -0.01 1.790"/>
+
+    <joint name="${prefix}table_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${prefix}table_link"/>
+      <xacro:insert_block name="origin"/>
+    </joint>
+
+    <link name="${prefix}table_link">
+      <visual>
+        <origin xyz="${table_mesh_offset}" rpy="0 0 0"/>
+        <geometry><mesh filename="${table_mesh}"/></geometry>
+        <material name="${prefix}table_aluminium"><color rgba="0.75 0.75 0.78 1.0"/></material>
+      </visual>
+      <collision>
+        <origin xyz="${table_mesh_offset}" rpy="0 0 0"/>
+        <geometry><mesh filename="${table_mesh}"/></geometry>
+      </collision>
+      <!-- no <inertial> on purpose: the table never moves, and without inertia
+           CoppeliaSim's URDF importer creates it as a static shape -->
+    </link>
+
+    <link name="${prefix}table_top"/>
+    <joint name="${prefix}table_top_joint" type="fixed">
+      <parent link="${prefix}table_link"/>
+      <child link="${prefix}table_top"/>
+      <origin xyz="${table_top_xyz}" rpy="0 0 0"/>
+    </joint>
+
+    <!-- roll = pi flips z downwards: whatever is attached here hangs from the plate -->
+    <link name="${prefix}robot_mount"/>
+    <joint name="${prefix}robot_mount_joint" type="fixed">
+      <parent link="${prefix}table_link"/>
+      <child link="${prefix}robot_mount"/>
+      <origin xyz="${robot_mount_xyz}" rpy="${pi} 0 0"/>
+    </joint>
+
+  </xacro:macro>
+</robot>
