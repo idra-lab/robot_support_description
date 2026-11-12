@@ -38,7 +38,7 @@ jobs:
       - name: Run linting
         run: |
           . /opt/ros/humble/setup.bash
-          colcon build --packages-select robot_support_description --mixin linter_cc_all
+          colcon test --packages-select robot_support_description
 
       - name: Validate xacro files
         run: |
